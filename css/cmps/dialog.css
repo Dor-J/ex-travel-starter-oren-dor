@@ -1,0 +1,47 @@
+dialog {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  padding: 1.5em;
+  border: none;
+  border-radius: 1em;
+  box-shadow: inset 0px 0px 15px 10px rgb(18 74 234 / 37%);
+  background-color: white;
+  z-index: 1000;
+  place-items: center;
+}
+
+dialog::backdrop {
+  background-image: linear-gradient(
+    45deg,
+    magenta,
+    rebeccapurple,
+    dodgerblue,
+    green
+  );
+  opacity: 0.75;
+}
+
+dialog form {
+  display: grid;
+  place-items: center;
+  gap: 1em;
+  text-align: center;
+  margin-block-end: 1em;
+}
+
+dialog form .location-rating,
+dialog form .location-name {
+  display: flex;
+
+  gap: 1em;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+dialog form .location-rating input {
+  text-align: center;
+  font-weight: 900;
+}
