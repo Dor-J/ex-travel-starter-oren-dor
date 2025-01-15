@@ -20,6 +20,8 @@ window.app = {
   onShareLoc,
   onSetSortBy,
   onSetFilterBy,
+  onCloseModal,
+  onSubmitForm,
 }
 
 function onInit() {
@@ -126,25 +128,20 @@ function onSearchAddress(ev) {
 }
 
 function onAddLoc(geo) {
-  const locName = prompt('Loc name', geo.address || 'Just a place')
-  if (!locName) return
+  const elDialog = document.querySelector('dialog.location-dialog')
+  const elTitle = elDialog.querySelector('h3 span')
+  const elLocationForm = elDialog.querySelector('form')
+  const elSelectedLocationInput = elDialog.querySelector('#selected-location')
+  const elInputRating = elDialog.querySelector('#input-rating')
+  const elLocationIdInput = elDialog.querySelector('.location-id')
 
-  const loc = {
-    name: locName,
-    rate: +prompt(`Rate (1-5)`, '3'),
-    geo,
-  }
-  locService
-    .save(loc)
-    .then((savedLoc) => {
-      flashMsg(`Added Location (id: ${savedLoc.id})`)
-      utilService.updateQueryParams({ locId: savedLoc.id })
-      loadAndRenderLocs()
-    })
-    .catch((err) => {
-      console.error('OOPs:', err)
-      flashMsg('Cannot add location')
-    })
+  elTitle.innerText = 'Add New'
+  elLocationIdInput.value = ''
+  elSelectedLocationInput.value = geo.address || 'Just a place'
+  elInputRating.value = 3
+
+  elLocationForm.dataset.geo = JSON.stringify(geo)
+  elDialog.showModal()
 }
 
 function loadAndRenderLocs() {
@@ -175,20 +172,21 @@ function onPanToUserPos() {
 
 function onUpdateLoc(locId) {
   locService.getById(locId).then((loc) => {
-    const rate = prompt('New rate?', loc.rate)
-    if (rate && rate !== loc.rate) {
-      loc.rate = rate
-      locService
-        .save(loc)
-        .then((savedLoc) => {
-          flashMsg(`Rate was set to: ${savedLoc.rate}`)
-          loadAndRenderLocs()
-        })
-        .catch((err) => {
-          console.error('OOPs:', err)
-          flashMsg('Cannot update location')
-        })
-    }
+    const elDialog = document.querySelector('dialog.location-dialog')
+    const elTitle = elDialog.querySelector('h3 span')
+    const elLocationForm = elDialog.querySelector('form')
+    const elSelectedLocationInput = elDialog.querySelector('#selected-location')
+    const elInputRating = elDialog.querySelector('#input-rating')
+    const elLocationIdInput = elDialog.querySelector('.location-id')
+
+    elTitle.innerText = 'Update'
+    elLocationIdInput.value = locId // set id for update
+    elSelectedLocationInput.value = loc.name
+    elInputRating.value = loc.rate
+
+    elLocationForm.dataset.currentLoc = JSON.stringify(loc)
+
+    elDialog.showModal()
   })
 }
 
@@ -359,4 +357,72 @@ function cleanStats(stats) {
     return acc
   }, [])
   return cleanedStats
+}
+
+function onCloseModal(ev) {
+  ev.preventDefault()
+  document.querySelector('dialog').close()
+}
+
+function onSubmitForm(ev) {
+  ev.preventDefault()
+
+  const form = ev.target
+  const locName = form.querySelector('#selected-location').value
+  const locRating = parseInt(form.querySelector('#input-rating').value)
+  const locId = form.querySelector('.location-id').value
+
+  if (!locName) {
+    flashMsg('Location name is required...')
+    return
+  }
+
+  if (isNaN(locRating) || locRating < 1 || locRating > 5) {
+    flashMsg('rating must be between 1 and 5...')
+    return
+  }
+
+  if (locId) {
+    // update
+    locService.getById(locId).then((loc) => {
+      loc.rate = locRating
+      locService
+        .save(loc)
+        .then((savedLoc) => {
+          flashMsg(
+            `Location updated: ${savedLoc.name} with rate ${savedLoc.rate}`
+          )
+          loadAndRenderLocs()
+          form.reset()
+          form.dataset.currentLoc = ''
+          document.querySelector('dialog.location-dialog').close()
+        })
+        .catch((err) => {
+          console.error('OOPs:', err)
+          flashMsg('Cannot update location.')
+        })
+    })
+  } else {
+    // new location
+    const geo = JSON.parse(form.dataset.geo)
+    const loc = {
+      name: locName,
+      rate: locRating,
+      geo,
+    }
+    locService
+      .save(loc)
+      .then((savedLoc) => {
+        flashMsg(`Added Location (id: ${savedLoc.id})`)
+        utilService.updateQueryParams({ locId: savedLoc.id })
+        loadAndRenderLocs()
+        form.reset()
+        form.dataset.geo = ''
+        document.querySelector('dialog.location-dialog').close()
+      })
+      .catch((err) => {
+        console.error('OOPs:', err)
+        flashMsg('Cannot add location.')
+      })
+  }
 }
