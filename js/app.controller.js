@@ -43,10 +43,21 @@ function renderLocs(locs) {
   var strHTML = locs
     .map((loc) => {
       const className = loc.id === selectedLocId ? 'active' : ''
+      const distanceFromUserPos = !gUserPos
+        ? ''
+        : `<span>Distance: ${utilService.getDistance(
+            gUserPos,
+            {
+              lat: loc.geo.lat,
+              lng: loc.geo.lng,
+            },
+            'K'
+          )}KM.</span>`
       return `
         <li class="loc ${className}" data-id="${loc.id}">
             <h4>  
                 <span>${loc.name}</span>
+                ${distanceFromUserPos}
                 <span title="${loc.rate} stars">${'★'.repeat(loc.rate)}</span>
             </h4>
             <p class="muted">
@@ -151,6 +162,7 @@ function onPanToUserPos() {
     .getUserPosition()
     .then((latLng) => {
       mapService.panTo({ ...latLng, zoom: 15 })
+      gUserPos = latLng
       unDisplayLoc()
       loadAndRenderLocs()
       flashMsg(`You are at Latitude: ${latLng.lat} Longitude: ${latLng.lng}`)
