@@ -277,11 +277,14 @@ function renderLocStats() {
   locService.getLocCountByRateMap().then((stats) => {
     handleStats(stats, 'loc-stats-rate')
   })
+  locService.getLocCountByDateMap().then((stats) => {
+    handleStats(stats, 'loc-stats-date')
+  })
 }
 
 function handleStats(stats, selector) {
   // stats = { low: 37, medium: 11, high: 100, total: 148 }
-  // stats = { low: 5, medium: 5, high: 5, baba: 55, mama: 30, total: 100 }
+  // stats = { never: 5, past: 5, never: 5 }
   const labels = cleanStats(stats)
   const colors = utilService.getColors()
 
