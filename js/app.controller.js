@@ -81,6 +81,8 @@ function renderLocs(locs) {
 }
 
 function onRemoveLoc(locId) {
+  const confirm = confirm('The will delete the location. Please confirm')
+  if (!confirm) return
   locService
     .remove(locId)
     .then(() => {
@@ -258,8 +260,8 @@ function onSetSortBy() {
 
   if (!prop) return
 
-    const sortBy = {}
-    sortBy[prop] = (isDesc) ? -1 : 1
+  const sortBy = {}
+  sortBy[prop] = isDesc ? -1 : 1
 
   locService.setSortBy(sortBy)
   loadAndRenderLocs()
