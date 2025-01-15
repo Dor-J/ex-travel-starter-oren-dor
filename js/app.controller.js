@@ -81,8 +81,8 @@ function renderLocs(locs) {
 }
 
 function onRemoveLoc(locId) {
-  const confirm = confirm('The will delete the location. Please confirm')
-  if (!confirm) return
+  let isSure = confirm('The will delete the location. Please confirm')
+  if (!isSure) return
   locService
     .remove(locId)
     .then(() => {
