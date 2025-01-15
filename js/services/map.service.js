@@ -8,7 +8,6 @@ export const mapService = {
   addClickListener,
 }
 
-// TODO: Enter your API Key
 const API_KEY = atob(CONFIG.encodedApiKey)
 var gMap
 var gMarker
