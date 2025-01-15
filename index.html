@@ -98,6 +98,34 @@
     </main>
     <pre class="debug" hidden></pre>
     <div class="user-msg"></div>
+
+    <dialog class="location-dialog">
+      <h3><span></span> Location</h3>
+      <form method="dialog" onsubmit="app.onSubmitForm(event)">
+        <input type="hidden" class="location-id" />
+        <div class="location-name">
+          <label for="selected-location">Selected location</label>
+          <input type="text" name="selected-location" id="selected-location" />
+        </div>
+        <div class="location-rating">
+          <label for="input-rating">Enter Rating</label>
+          <input
+            type="number"
+            name="input-rating"
+            id="input-rating"
+            min="1"
+            max="5"
+            value="3"
+            autofocus
+            required
+          />
+        </div>
+        <div class="form-btns">
+          <input type="submit" value="Submit" class="btn-submit" />
+          <button onclick="app.onCloseModal(event)">Close</button>
+        </div>
+      </form>
+    </dialog>
     <script type="module" src="js/app.controller.js"></script>
   </body>
 </html>
