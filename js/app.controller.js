@@ -2,6 +2,10 @@ import { utilService } from './services/util.service.js'
 import { locService } from './services/loc.service.js'
 import { mapService } from './services/map.service.js'
 
+// Globals
+// gUserPos: save the current location of user
+var gUserPos = null
+
 window.onload = onInit
 
 // To make things easier in this project structure
